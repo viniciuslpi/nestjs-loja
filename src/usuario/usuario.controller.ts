@@ -1,7 +1,9 @@
 /* eslint-disable prettier/prettier */
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { CriaUsuarioDTO } from './dto/CriaUsuario.dto';
+import { UsuarioEntity } from './usuario.entity';
 import { UsuarioRepository } from './usuario.repository';
+import { v4 as uuid } from 'uuid';
 
 @Controller('/usuarios')
 export class UsuarioController {
@@ -10,8 +12,19 @@ export class UsuarioController {
 
     @Post()
     async criaUsuario(@Body() dadosUsuario: CriaUsuarioDTO) {
-        this.usuarioRepository.salvar(dadosUsuario);        
-        return dadosUsuario;
+        const usuarioEntity = new UsuarioEntity();
+
+        usuarioEntity.nome  = dadosUsuario.nome;
+        usuarioEntity.email = dadosUsuario.email;
+        usuarioEntity.senha = dadosUsuario.senha;
+        usuarioEntity.id    = uuid();
+        
+        this.usuarioRepository.salvar(usuarioEntity);    
+
+        return { 
+            id: usuarioEntity.id,
+            message: 'usuario criado'
+        }
     } 
 
     @Get()
